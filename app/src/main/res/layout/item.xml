@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:layout_marginLeft="20dp"
+    android:layout_marginTop="64dp"
+    android:layout_marginRight="20dp"
+    android:layout_marginBottom="48dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/card_frame"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1.0">
+
+            <ImageView
+                android:id="@+id/cardImage"
+                android:layout_width="300dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                android:padding="4dp"
+                android:scaleType="centerCrop" />
+        </FrameLayout>
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:layout_margin="4dp"
+            android:background="#F2F2F2" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:padding="2sp"
+            android:textSize="18sp"
+            android:textColor="#0000CD"
+            tools:text="Test Title" />
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:layout_margin="4dp"
+            android:background="#F2F2F2" />
+
+        <ScrollView
+            android:layout_width="300dp"
+            android:layout_height="0dp"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_weight="1.0">
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:textColor="#787878"
+                android:textSize="16sp"
+                tools:text="Description test" />
+        </ScrollView>
+
+    </LinearLayout>
+
+
+    <View
+        android:id="@+id/item_swipe_left_indicator"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="left|center_vertical"
+        android:alpha="0"
+        android:background="@drawable/like" />
+
+    <View
+        android:id="@+id/item_swipe_right_indicator"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="right|center_vertical"
+        android:alpha="0"
+        android:background="@drawable/nope" />
+
+</FrameLayout>
