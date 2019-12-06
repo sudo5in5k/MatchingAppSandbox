@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.myapplication.R
 import com.example.myapplication.repository.remote.ArticleEntity
+import com.example.myapplication.util.RequestResult
 import com.example.myapplication.util.ViewModelFactory
 import com.lorentzos.flingswipe.SwipeFlingAdapterView
 import io.reactivex.disposables.CompositeDisposable
@@ -37,13 +38,16 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this, ViewModelFactory()).get(MainViewModel::class.java)
 
-        viewModel.loadResults("タピオカ").observe(this, Observer {
-            when (it.status) {
-                "ok" -> {
-                    viewModel.postArticles(it.articles)
-                    Log.d("ushi", it.articles?.get(0)?.description)
+        viewModel.loadResults("タピオカ").observe(this, Observer {result ->
+            when (result) {
+                is RequestResult.Success -> {
+                    val data = result.data
+                    if (data.status == "ok") {
+                        viewModel.postArticles(data.articles)
+                        Log.d("ushi", data.articles?.get(0)?.description ?: "null?")
+                    }
                 }
-                else -> {
+                is RequestResult.Failure -> {
                     Log.d("ushi", "Error")
                 }
             }

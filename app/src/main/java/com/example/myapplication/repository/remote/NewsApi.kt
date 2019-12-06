@@ -1,9 +1,6 @@
 package com.example.myapplication.repository.remote
 
 import io.reactivex.Flowable
-import io.reactivex.Observable
-import io.reactivex.Single
-import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
