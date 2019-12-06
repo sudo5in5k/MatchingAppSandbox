@@ -41,10 +41,10 @@ class MainActivity : AppCompatActivity() {
         viewModel.loadResults("タピオカ").observe(this, Observer {result ->
             when (result) {
                 is RequestResult.Success -> {
-                    val data = result.data
-                    if (data.status == "ok") {
-                        viewModel.postArticles(data.articles)
-                        Log.d("ushi", data.articles?.get(0)?.description ?: "null?")
+                    val resultData = result.data
+                    if (resultData.status == "ok") {
+                        viewModel.postArticles(resultData.articles)
+                        Log.d("ushi", resultData.articles?.get(0)?.description ?: "null?")
                     }
                 }
                 is RequestResult.Failure -> {

@@ -23,6 +23,12 @@ class MainViewModel(private val repository: Repository) : ViewModel() {
         return repository.fetchData(name).toLiveData()
     }
 
+    fun onCardSwiped() {
+        val tempArticle: ArrayList<ArticleEntity>? = (articles.value as? ArrayList<ArticleEntity>)
+        tempArticle?.removeAt(0)
+        articles.postValue(tempArticle)
+    }
+
     override fun onCleared() {
         super.onCleared()
         disposable.clear()

@@ -5,7 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 /**
- * @see: https://supporterzcolab.com/about/api/
+ * @see:
  */
 interface NewsApi {
 
