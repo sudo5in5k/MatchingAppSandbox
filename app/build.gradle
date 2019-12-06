@@ -36,4 +36,24 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+
+    // Rx
+    def rxkt_version = "2.4.0"
+    implementation "io.reactivex.rxjava2:rxkotlin:${rxkt_version}"
+    def rxandroid_version = "2.1.1"
+    implementation "io.reactivex.rxjava2:rxandroid:${rxandroid_version}"
+
+    // Coroutines
+
+
+    // Retrofit
+    def retrofit_version = "2.6.2"
+    implementation "com.squareup.retrofit2:retrofit:${retrofit_version}"
+    implementation "com.squareup.retrofit2:converter-gson:${retrofit_version}"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:${retrofit_version}"
+
+    // LifeCycleExtensions
+    def lifecycle_version = "2.1.0"
+    implementation "androidx.lifecycle:lifecycle-reactivestreams:$lifecycle_version"
+
 }
