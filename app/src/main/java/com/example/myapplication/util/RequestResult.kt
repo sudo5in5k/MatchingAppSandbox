@@ -6,6 +6,6 @@ sealed class RequestResult<T> {
 
     companion object {
         fun <T> success(data: T): RequestResult<T> = Success(data)
-        fun <T> failure(e: Throwable): RequestResult<T> = Failure(e)
+        fun <T> failure(t: Throwable): RequestResult<T> = Failure(t)
     }
 }

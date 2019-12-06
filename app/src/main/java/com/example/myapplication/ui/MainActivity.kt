@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 is RequestResult.Failure -> {
-                    Log.d("ushi", "Error")
+                    Log.d("ushi", "${result.t}")
                 }
             }
         })
