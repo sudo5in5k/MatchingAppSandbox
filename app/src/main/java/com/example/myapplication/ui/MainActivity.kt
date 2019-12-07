@@ -1,77 +1,68 @@
 package com.example.myapplication.ui
 
-import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import com.bumptech.glide.Glide
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.R
-import com.example.myapplication.repository.SampleData
-import com.example.myapplication.repository.SampleDataRepository
+import com.example.myapplication.databinding.ActivityMainBinding
+import com.example.myapplication.databinding.ItemBinding
+import com.example.myapplication.repository.remote.ArticleEntity
+import com.example.myapplication.util.RequestResult
+import com.example.myapplication.util.ViewModelFactory
 import com.lorentzos.flingswipe.SwipeFlingAdapterView
-import kotlinx.android.synthetic.main.activity_main.*
-import java.util.logging.Logger
+import io.reactivex.disposables.CompositeDisposable
 
 class MainActivity : AppCompatActivity() {
 
-    var likeCount = 0
-    var nopeCount = 0
+    private val disposable = CompositeDisposable()
+
+    private lateinit var viewModel: MainViewModel
+    private lateinit var activityMainBinding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        activityMainBinding.lifecycleOwner = this
 
-        val data = SampleDataRepository().getDataList()
-        val cardAdapter = CardAdapter(data, this)
-        val cardsCount = cardAdapter.count
-        var count = cardAdapter.count
+        viewModel = ViewModelProvider(this, ViewModelFactory()).get(MainViewModel::class.java)
 
-        val countButton = findViewById<Button>(R.id.count_button)
-        countButton.text = "$count / $cardsCount"
+        activityMainBinding.also {
+            it.activity = this@MainActivity
+            it.viewModel = viewModel
+        }
 
-        val flingContainer = findViewById<SwipeFlingAdapterView>(R.id.fling)
-        fling.apply {
-            adapter = cardAdapter
-            setFlingListener(object : SwipeFlingAdapterView.onFlingListener {
+        val cardAdapter = CardAdapter(viewModel.articles.value)
+
+        activityMainBinding.fling.also {
+            it.adapter = cardAdapter
+            it.setFlingListener(object : SwipeFlingAdapterView.onFlingListener {
                 override fun removeFirstObjectInAdapter() {
-                    return Unit
+                    return
                 }
 
-                override fun onLeftCardExit(p0: Any?) {
-                    data.removeAt(0)
-                    count--
-                    likeCount++
+                override fun onLeftCardExit(article: Any?) {
+                    viewModel.onLeftSwiped()
                     cardAdapter.notifyDataSetChanged()
-                    countButton.text = "$count / $cardsCount"
-                    if (count == 0) {
-                        showBackView()
-                    }
                 }
 
-                override fun onRightCardExit(p0: Any?) {
-                    data.removeAt(0)
-                    count--
-                    nopeCount++
+                override fun onRightCardExit(article: Any?) {
+                    viewModel.onRightSwiped()
                     cardAdapter.notifyDataSetChanged()
-                    countButton.text = "$count / $cardsCount"
-                    if (count == 0) {
-                        showBackView()
-                    }
                 }
 
                 override fun onAdapterAboutToEmpty(p0: Int) {
-                    return Unit
+                    return
                 }
 
                 override fun onScroll(p0: Float) {
-                    flingContainer.selectedView.apply {
+                    it.selectedView.apply {
                         findViewById<View>(R.id.item_swipe_left_indicator).alpha =
                             if (p0 < 0) -p0 else 0.0F
                         findViewById<View>(R.id.item_swipe_right_indicator).alpha =
@@ -81,54 +72,74 @@ class MainActivity : AppCompatActivity() {
 
             })
 
-            setOnItemClickListener { _, _ ->
+            it.setOnItemClickListener { _, _ ->
                 cardAdapter.notifyDataSetChanged()
             }
         }
 
-    }
-
-    fun showBackView() {
-        findViewById<View>(R.id.finish_matching_text).visibility = View.VISIBLE
-        findViewById<View>(R.id.grid).visibility = View.VISIBLE
-        findViewById<TextView>(R.id.likeCount).text = "$likeCount"
-        findViewById<TextView>(R.id.nopeCount).text = "$nopeCount"
-    }
-
-    class CardViewHolder(val title: TextView, val descriptor: TextView, val cardImage: ImageView)
-
-    class CardAdapter(private val arrayList: ArrayList<SampleData>, private val context: Context) :
-        BaseAdapter() {
-        private lateinit var viewHolder: CardViewHolder
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            var rowView = convertView
-            if (rowView == null) {
-                val inflater = LayoutInflater.from(context)
-                rowView = inflater.inflate(R.layout.item, parent, false)
-                viewHolder = CardViewHolder(
-                    rowView.findViewById(R.id.title),
-                    rowView.findViewById(R.id.description),
-                    rowView.findViewById(R.id.cardImage)
-                )
-                rowView.tag = viewHolder
-            } else {
-                viewHolder = rowView.tag as CardViewHolder
+        viewModel.loadResults(NEWS_TOPIC).observe(this, Observer { result ->
+            when (result) {
+                is RequestResult.Success -> {
+                    val resultData = result.data
+                    if (resultData.status == "ok") {
+                        //TODO 冗長
+                        viewModel.initCount(resultData.articles?.size ?: 0)
+                        viewModel.postArticles(resultData.articles)
+                        cardAdapter.setAllItem(resultData.articles)
+                    }
+                }
+                is RequestResult.Failure -> {
+                    Log.d("ushi", "${result.t}")
+                }
             }
-            viewHolder.title.text = arrayList[position].title
-            viewHolder.descriptor.text = arrayList[position].description
-            Glide.with(context).load(arrayList[position].imagePath).into(viewHolder.cardImage)
-            return rowView!!
+        })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposable.clear()
+    }
+
+    class CardAdapter(
+        private var adapterArticles: List<ArticleEntity>?
+    ) : BaseAdapter() {
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+
+            val binding = if (convertView == null) {
+                ItemBinding.inflate(
+                    LayoutInflater.from(parent?.context),
+                    parent,
+                    false
+                ).apply {
+                    root.tag = this
+                }
+            } else {
+                convertView.tag as ItemBinding
+            }
+            binding.article = getItem(position)
+            binding.imageUrl = getItem(position)?.urlToImage
+            return binding.root
         }
 
-        override fun getItem(position: Int): Any {
-            return position
+        fun setAllItem(articles: List<ArticleEntity>?) {
+            adapterArticles = articles
+            notifyDataSetChanged()
+        }
+
+        override fun getItem(position: Int): ArticleEntity? {
+            return adapterArticles?.get(position)
         }
 
         override fun getItemId(position: Int) = position.toLong()
 
         override fun getCount(): Int {
-            return arrayList.count()
+            return adapterArticles?.count() ?: 0
         }
 
+    }
+
+    companion object {
+        const val NEWS_TOPIC = "タピオカ"
     }
 }
