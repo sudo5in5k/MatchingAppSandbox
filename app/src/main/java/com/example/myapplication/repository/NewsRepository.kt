@@ -13,7 +13,7 @@ class NewsRepository : Repository {
         get() = ApiService()
 
     override fun fetchData(name: String): Flowable<RequestResult<ApiEntity>> {
-        return api.query(name, "3b007aa115c24b6e8f05844c7c33c621", "popularity", 100)
+        return api.query(name, "3b007aa115c24b6e8f05844c7c33c621", "popularity", 10)
             .subscribeOn(Schedulers.io()).toResult()
     }
 }

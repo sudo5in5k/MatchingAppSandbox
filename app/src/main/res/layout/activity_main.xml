@@ -4,9 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
+        <import type="android.view.View" />
+
         <variable
             name="viewModel"
             type="com.example.myapplication.ui.MainViewModel" />
+
         <variable
             name="activity"
             type="com.example.myapplication.ui.MainActivity" />
@@ -30,6 +34,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="20dp"
                 android:background="@drawable/button_frame"
+                android:text="@{viewModel.countText}"
                 android:textColor="#F8F8F8"
                 tools:text="TEST" />
 
@@ -49,7 +54,7 @@
                 android:gravity="center"
                 android:text="@string/article_end"
                 android:textSize="20sp"
-                android:visibility="invisible"
+                android:visibility="@{viewModel.contentsEnd ? View.VISIBLE : View.INVISIBLE}"
                 tools:visibility="visible" />
 
             <GridLayout
@@ -59,7 +64,7 @@
                 android:layout_gravity="center"
                 android:columnCount="2"
                 android:rowCount="2"
-                android:visibility="invisible"
+                android:visibility="@{viewModel.contentsEnd ? View.VISIBLE : View.INVISIBLE}"
                 tools:visibility="visible">
 
                 <ImageView
@@ -79,6 +84,7 @@
                     android:layout_row="0"
                     android:layout_column="1"
                     android:gravity="center"
+                    android:text="@{String.valueOf(viewModel.likeCount)}"
                     android:textSize="40sp"
                     tools:text="10" />
 
@@ -98,6 +104,7 @@
                     android:layout_row="1"
                     android:layout_column="1"
                     android:gravity="center"
+                    android:text="@{String.valueOf(viewModel.nopeCount)}"
                     android:textSize="40sp"
                     tools:text="2" />
 

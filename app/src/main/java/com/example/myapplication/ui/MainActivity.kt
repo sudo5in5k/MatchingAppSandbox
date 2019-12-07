@@ -6,8 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -23,10 +21,6 @@ import io.reactivex.disposables.CompositeDisposable
 
 class MainActivity : AppCompatActivity() {
 
-    var likeCount = 0
-    var nopeCount = 0
-
-    //private var data: ArrayList<ArticleEntity>? = null
     private val disposable = CompositeDisposable()
 
     private lateinit var viewModel: MainViewModel
@@ -34,8 +28,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //setContentView(R.layout.activity_main)
-
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         activityMainBinding.lifecycleOwner = this
 
@@ -47,11 +39,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         val cardAdapter = CardAdapter(viewModel.articles.value)
-        val cardsCount = cardAdapter.count
-        var count = cardAdapter.count
-
-        val countButton = findViewById<Button>(R.id.count_button)
-        countButton.text = "$count / $cardsCount"
 
         activityMainBinding.fling.also {
             it.adapter = cardAdapter
@@ -61,25 +48,13 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun onLeftCardExit(article: Any?) {
-                    viewModel.onCardSwiped()
-                    count--
-                    likeCount++
+                    viewModel.onLeftSwiped()
                     cardAdapter.notifyDataSetChanged()
-                    countButton.text = "$count / $cardsCount"
-                    if (count == 0) {
-                        showBackView()
-                    }
                 }
 
                 override fun onRightCardExit(article: Any?) {
-                    viewModel.onCardSwiped()
-                    count--
-                    nopeCount++
+                    viewModel.onRightSwiped()
                     cardAdapter.notifyDataSetChanged()
-                    countButton.text = "$count / $cardsCount"
-                    if (count == 0) {
-                        showBackView()
-                    }
                 }
 
                 override fun onAdapterAboutToEmpty(p0: Int) {
@@ -102,14 +77,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.loadResults(NAME).observe(this, Observer { result ->
+        viewModel.loadResults(NEWS_TOPIC).observe(this, Observer { result ->
             when (result) {
                 is RequestResult.Success -> {
                     val resultData = result.data
                     if (resultData.status == "ok") {
                         //TODO 冗長
-                        cardAdapter.setAllItem(resultData.articles)
+                        viewModel.initCount(resultData.articles?.size ?: 0)
                         viewModel.postArticles(resultData.articles)
+                        cardAdapter.setAllItem(resultData.articles)
                     }
                 }
                 is RequestResult.Failure -> {
@@ -117,23 +93,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
-
-        viewModel.articles.observe(this, Observer {
-
-            Log.d("ushi", "articleObserve: $it")
-        })
     }
 
     override fun onDestroy() {
         super.onDestroy()
         disposable.clear()
-    }
-
-    fun showBackView() {
-        findViewById<View>(R.id.finish_matching_text).visibility = View.VISIBLE
-        findViewById<View>(R.id.grid).visibility = View.VISIBLE
-        findViewById<TextView>(R.id.likeCount).text = "$likeCount"
-        findViewById<TextView>(R.id.nopeCount).text = "$nopeCount"
     }
 
     class CardAdapter(
@@ -176,6 +140,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val NAME = "タピオカ"
+        const val NEWS_TOPIC = "タピオカ"
     }
 }
