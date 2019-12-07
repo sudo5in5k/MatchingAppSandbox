@@ -12,7 +12,7 @@ import io.reactivex.disposables.CompositeDisposable
 
 class MainViewModel(private val repository: Repository) : ViewModel() {
 
-    private val articles = MutableLiveData<List<ArticleEntity>>()
+    val articles = MutableLiveData<List<ArticleEntity>>()
     private val disposable = CompositeDisposable()
 
     fun postArticles(list: List<ArticleEntity>?) {
