@@ -61,7 +61,7 @@
                 android:text="@{article.title}"
                 android:textColor="#0000CD"
                 android:textSize="18sp"
-                tools:text="Test Title" />
+                tools:text="@string/dummy_long_title" />
 
             <View
                 android:layout_width="wrap_content"
@@ -78,12 +78,12 @@
                 <TextView
                     android:id="@+id/description"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
                     android:padding="4dp"
                     android:text="@{article.description}"
                     android:textColor="#787878"
                     android:textSize="16sp"
-                    tools:text="Description" />
+                    tools:text="@string/dummy_long_text" />
             </ScrollView>
 
         </LinearLayout>

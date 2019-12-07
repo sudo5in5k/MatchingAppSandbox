@@ -78,18 +78,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         viewModel.loadResults(NEWS_TOPIC).observe(this, Observer { result ->
-            when (result) {
-                is RequestResult.Success -> {
-                    val resultData = result.data
-                    if (resultData.status == "ok") {
-                        //TODO 冗長
-                        viewModel.initCount(resultData.articles?.size ?: 0)
-                        viewModel.postArticles(resultData.articles)
-                        cardAdapter.setAllItem(resultData.articles)
+            if (viewModel.articles.value == null) {
+                when (result) {
+                    is RequestResult.Success -> {
+                        val resultData = result.data
+                        if (resultData.status == "ok") {
+                            //TODO 冗長
+                            viewModel.initCount(resultData.articles?.size ?: 0)
+                            viewModel.postArticles(resultData.articles)
+                            cardAdapter.setAllItem(resultData.articles)
+                        }
                     }
-                }
-                is RequestResult.Failure -> {
-                    Log.d("ushi", "${result.t}")
+                    is RequestResult.Failure -> {
+                        Log.d("ushi", "${result.t}")
+                    }
                 }
             }
         })

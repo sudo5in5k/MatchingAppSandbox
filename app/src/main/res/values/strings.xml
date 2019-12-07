@@ -2,4 +2,6 @@
     <string name="app_name">MatchingAppSandbox</string>
     <string name="article_end">今日の記事は終わりです</string>
     <string name="content_description">null</string>
+    <string name="dummy_long_title">President Donald Trump appeared to be in a fractious mood as he </string>
+    <string name="dummy_long_text">President Donald Trump appeared to be in a fractious mood as he met with world leaders at the NATO summit outside London on Wednesday, calling the leader of the US northern neighbor "two-faced" and abruptly canceling his end-of-meeting press conference which was scheduled to take place while the House Judiciary Committee is holding its first hearing as part of the ongoing impeachment inquiry.</string>
 </resources>
