@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     private var data: ArrayList<ArticleEntity>? = null
     private val disposable = CompositeDisposable()
 
-    lateinit var viewModel: MainViewModel
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this, ViewModelFactory()).get(MainViewModel::class.java)
 
-        viewModel.loadResults("タピオカ").observe(this, Observer {result ->
+        viewModel.loadResults(NAME).observe(this, Observer { result ->
             when (result) {
                 is RequestResult.Success -> {
                     val resultData = result.data
@@ -161,5 +161,9 @@ class MainActivity : AppCompatActivity() {
             return arrayList?.count() ?: 0
         }
 
+    }
+
+    companion object {
+        const val NAME = "tapioka"
     }
 }
